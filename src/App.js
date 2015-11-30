@@ -1,64 +1,27 @@
 import React, { Component, PropTypes } from 'react'
 import ReactDOM from 'react-dom'
-
-const width = 400
-const height = 400
-const speed = 255
-
-function wrap(value, min, max) {
-  if (value > max) return min
-  if (value < min) return max
-  return value
-}
-
-class Robot extends Component {
-  static propTypes = {
-    x: PropTypes.number.isRequired,
-    y: PropTypes.number.isRequired,
-    a: PropTypes.number.isRequired
-  }
-
-  componentDidMount () {
-    const context = ReactDOM.findDOMNode(this).getContext('2d')
-    this.paint(context)
-  }
-
-  componentDidUpdate () {
-    const context = ReactDOM.findDOMNode(this).getContext('2d')
-    context.clearRect(0, 0, width, height)
-    this.paint(context)
-  }
-
-  paint (context) {
-    const { x, y, a } = this.props
-    context.save()
-    context.translate(x, y)
-    context.rotate(a, 100, 100)
-    context.fillStyle = '#F00'
-    context.fillRect(-10, -10, 20, 20)
-    context.fillStyle = '#000'
-    context.fillRect(-10, -10, 4, 20)
-    context.fillRect(6, -10, 4, 20)
-    context.fillStyle = '#FF0'
-    context.fillRect(-6, -10, 12, 2)
-    context.restore()
-  }
-
-  render () {
-    return <canvas width={width} height={height} />
-  }
-}
+import TractorBeam from './TractorBeam'
 
 const W = 87
 const A = 65
 const S = 83
 const D = 68
+const maxSpeed = 255
+
+function clamp (value, min, max) {
+  if (value > max) return max
+  if (value < min) return min
+  return value
+}
+
+function clampSpeed (value) {
+  return clamp(value, -maxSpeed, maxSpeed)
+}
 
 export class App extends Component {
   constructor (props, context) {
     super(props, context)
-    this.state = { keys: [], x: width / 2, y: height / 2, a: 0 }
-    this.handleTick = this.handleTick.bind(this)
+    this.state = { keys: [], motors: [0, 0] }
     this.handleKeyDown = this.handleKeyDown.bind(this)
     this.handleKeyUp = this.handleKeyUp.bind(this)
   }
@@ -66,7 +29,6 @@ export class App extends Component {
   componentDidMount () {
     document.addEventListener('keydown', this.handleKeyDown)
     document.addEventListener('keyup', this.handleKeyUp)
-    requestAnimationFrame(this.handleTick)
   }
 
   componentWillUnmount () {
@@ -74,33 +36,40 @@ export class App extends Component {
     document.removeEventListener('keyup', this.handleKeyUp)
   }
 
-  handleTick () {
-    let { keys, x, y, a } = this.state
-    if (~keys.indexOf(A)) a = a - 0.02
-    if (~keys.indexOf(D)) a = a + 0.02
-    if (~keys.indexOf(W)) {
-      x = wrap(x + Math.sin(a), 0, width)
-      y = wrap(y - Math.cos(a), 0, height)
+  updateKeys (keys) {
+    let motors = [0, 0]
+    let direction = 1
+    if (~keys.indexOf(W) && ~keys.indexOf(S)) {
+    } else if (~keys.indexOf(W)) {
+      motors[0] = maxSpeed
+      motors[1] = maxSpeed
+    } else if (~keys.indexOf(S)) {
+      direction = -1
+      motors[0] = -maxSpeed
+      motors[1] = -maxSpeed
     }
-    if (~keys.indexOf(S)) {
-      x = wrap(x - Math.sin(a), 0, width)
-      y = wrap(y + Math.cos(a), 0, height)
+    if (~keys.indexOf(A) && ~keys.indexOf(D)) {
+    } else if (~keys.indexOf(A)) {
+      motors[0] = clampSpeed(motors[0] - maxSpeed / 2 * direction)
+      motors[1] = clampSpeed(motors[1] + maxSpeed / 2 * direction)
+    } else if (~keys.indexOf(D)) {
+      motors[0] = clampSpeed(motors[0] + maxSpeed / 2 * direction)
+      motors[1] = clampSpeed(motors[1] - maxSpeed / 2 * direction)
     }
-    this.setState({ x, y, a })
-    requestAnimationFrame(this.handleTick)
+    this.setState({ keys, motors })
   }
 
   handleKeyDown (e) {
     const keys = this.state.keys.concat(e.keyCode)
-    this.setState({ keys })
+    this.updateKeys(keys)
   }
 
   handleKeyUp (e) {
     const keys = this.state.keys.filter(k => k !== e.keyCode)
-    this.setState({ keys })
+    this.updateKeys(keys)
   }
 
   render () {
-    return <Robot {...this.state}/>
+    return <TractorBeam {...this.state}/>
   }
 }
