@@ -45,6 +45,14 @@ export default class TractorBeam extends Component {
     context.save()
     context.translate(x, y)
     context.rotate(a, 100, 100)
+    context.beginPath()
+    context.moveTo(100, -100)
+    context.lineTo(0, 0)
+    context.lineTo(-100, -100)
+    context.closePath()
+    context.fillStyle = '#FFB'
+    context.fill()
+    context.fillStyle = '#000'
     context.fillRect(-10, -10, 4, 20)
     context.fillRect(6, -10, 4, 20)
     context.fillStyle = '#F00'

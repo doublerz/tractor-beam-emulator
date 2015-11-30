@@ -38,8 +38,7 @@ export class App extends Component {
   updateKeys (keys) {
     let motors = [0, 0]
     let direction = 1
-    if (~keys.indexOf(W) && ~keys.indexOf(S)) {
-    } else if (~keys.indexOf(W)) {
+    if (~keys.indexOf(W)) {
       motors[0] = maxSpeed
       motors[1] = maxSpeed
     } else if (~keys.indexOf(S)) {
@@ -47,8 +46,7 @@ export class App extends Component {
       motors[0] = -maxSpeed
       motors[1] = -maxSpeed
     }
-    if (~keys.indexOf(A) && ~keys.indexOf(D)) {
-    } else if (~keys.indexOf(A)) {
+    if (~keys.indexOf(A)) {
       motors[0] = clampSpeed(motors[0] - maxSpeed / 2 * direction)
       motors[1] = clampSpeed(motors[1] + maxSpeed / 2 * direction)
     } else if (~keys.indexOf(D)) {
