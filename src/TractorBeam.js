@@ -13,7 +13,7 @@ function wrap (value, min, max) {
 
 export default class TractorBeam extends Component {
   static propTypes = {
-    keys: PropTypes.array.isRequired
+    motors: PropTypes.array.isRequired
   }
 
   constructor (props, context) {
@@ -31,7 +31,7 @@ export default class TractorBeam extends Component {
   componentDidMount () {
     const context = ReactDOM.findDOMNode(this).getContext('2d')
     this.paint(context)
-    requestAnimationFrame(this.handleTick)
+    window.requestAnimationFrame(this.handleTick)
   }
 
   componentDidUpdate () {
@@ -66,7 +66,7 @@ export default class TractorBeam extends Component {
     y = wrap(y - dy, 0, height)
 
     this.setState({ x, y, a })
-    requestAnimationFrame(this.handleTick)
+    window.requestAnimationFrame(this.handleTick)
   }
 
   render () {

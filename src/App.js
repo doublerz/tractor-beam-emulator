@@ -1,5 +1,4 @@
-import React, { Component, PropTypes } from 'react'
-import ReactDOM from 'react-dom'
+import React, { Component } from 'react'
 import TractorBeam from './TractorBeam'
 
 const W = 87
@@ -70,6 +69,8 @@ export class App extends Component {
   }
 
   render () {
-    return <TractorBeam {...this.state}/>
+    return (
+      <TractorBeam {...this.state}/>
+    )
   }
 }
