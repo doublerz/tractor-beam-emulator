@@ -13,7 +13,7 @@ function wrap (value, min, max) {
 
 export default class TractorBeam extends Component {
   static propTypes = {
-    motors: PropTypes.array.isRequired
+    speeds: PropTypes.array.isRequired
   }
 
   constructor (props, context) {
@@ -43,14 +43,16 @@ export default class TractorBeam extends Component {
   paint (context) {
     const { x, y, a } = this.state
     context.save()
+    context.fillStyle = '#FFF'
+    context.fillRect(0, 0, width, height)
     context.translate(x, y)
     context.rotate(a, 100, 100)
+    context.fillStyle = '#FFB'
     context.beginPath()
     context.moveTo(100, -100)
     context.lineTo(0, 0)
     context.lineTo(-100, -100)
     context.closePath()
-    context.fillStyle = '#FFB'
     context.fill()
     context.fillStyle = '#000'
     context.fillRect(-10, -10, 4, 20)
@@ -61,13 +63,13 @@ export default class TractorBeam extends Component {
   }
 
   handleTick () {
-    const { motors } = this.props
+    const { speeds } = this.props
     let { x, y, a } = this.state
 
-    const da = (motors[0] - motors[1]) / maxSpeed / 30
+    const da = (speeds[0] - speeds[1]) / maxSpeed / 30
     a = wrap(a + da, -Math.PI, Math.PI)
 
-    const direction = Math.sign(motors[0] + motors[1])
+    const direction = Math.sign(speeds[0] + speeds[1])
     const dx = Math.sin(a) * direction
     const dy = Math.cos(a) * direction
     x = wrap(x + dx, 0, width)

@@ -42,7 +42,8 @@
   },
   "dependencies": {
     "react": "^0.14.0",
-    "react-dom": "^0.14.0"
+    "react-dom": "^0.14.0",
+    "simplewebrtc": "^2.0.0"
   },
   "standard": {
     "parser": "babel-eslint"

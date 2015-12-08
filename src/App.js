@@ -1,74 +1,41 @@
 import React, { Component } from 'react'
+import ReactDOM from 'react-dom'
+import SimpleWebRTC from 'simplewebrtc'
 import TractorBeam from './TractorBeam'
-
-const W = 87
-const A = 65
-const S = 83
-const D = 68
-const maxSpeed = 255
-
-function clamp (value, min, max) {
-  if (value > max) return max
-  if (value < min) return min
-  return value
-}
-
-function clampSpeed (value) {
-  return clamp(value, -maxSpeed, maxSpeed)
-}
 
 export class App extends Component {
   constructor (props, context) {
     super(props, context)
-    this.state = { keys: [], motors: [0, 0] }
-    this.handleKeyDown = this.handleKeyDown.bind(this)
-    this.handleKeyUp = this.handleKeyUp.bind(this)
+    this.state = { speeds: [0, 0] }
   }
 
   componentDidMount () {
-    document.addEventListener('keydown', this.handleKeyDown)
-    document.addEventListener('keyup', this.handleKeyUp)
+    this._webrtc = new SimpleWebRTC({
+      remoteVideosEl: this.refs.remotes
+    })
+    this._webrtc.joinRoom('beam')
+    const canvas = ReactDOM.findDOMNode(this.refs.beam)
+    const stream = canvas.captureStream(60)
+    this._webrtc.webrtc.localStreams.push(stream)
+    this._webrtc.on('createdPeer', (peer) => {
+      peer.on('channelMessage', (peer, label, message) => {
+        if (message.type === 'speeds') {
+          this.setState({ speeds: message.payload })
+        }
+      })
+    })
   }
 
   componentWillUnmount () {
-    document.removeEventListener('keydown', this.handleKeyDown)
-    document.removeEventListener('keyup', this.handleKeyUp)
-  }
-
-  updateKeys (keys) {
-    let motors = [0, 0]
-    let direction = 1
-    if (~keys.indexOf(W)) {
-      motors[0] = maxSpeed
-      motors[1] = maxSpeed
-    } else if (~keys.indexOf(S)) {
-      direction = -1
-      motors[0] = -maxSpeed
-      motors[1] = -maxSpeed
-    }
-    if (~keys.indexOf(A)) {
-      motors[0] = clampSpeed(motors[0] - maxSpeed / 2 * direction)
-      motors[1] = clampSpeed(motors[1] + maxSpeed / 2 * direction)
-    } else if (~keys.indexOf(D)) {
-      motors[0] = clampSpeed(motors[0] + maxSpeed / 2 * direction)
-      motors[1] = clampSpeed(motors[1] - maxSpeed / 2 * direction)
-    }
-    this.setState({ keys, motors })
-  }
-
-  handleKeyDown (e) {
-    const keys = this.state.keys.concat(e.keyCode)
-    this.updateKeys(keys)
-  }
-
-  handleKeyUp (e) {
-    const keys = this.state.keys.filter(k => k !== e.keyCode)
-    this.updateKeys(keys)
+    this._webrtc.leaveRoom()
   }
 
   render () {
     return (
-      <TractorBeam {...this.state}/>
+      <div>
+        <div className='remotes' ref='remotes'/>
+        <TractorBeam ref='beam' {...this.state}/>
+      </div>
     )
   }
 }
