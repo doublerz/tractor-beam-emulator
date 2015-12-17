@@ -13,15 +13,13 @@ export class App extends Component {
     this._webrtc = new SimpleWebRTC({
       remoteVideosEl: this.refs.remotes
     })
-    this._webrtc.joinRoom('beam')
+    this._webrtc.joinRoom('tractor-beam')
     const canvas = ReactDOM.findDOMNode(this.refs.beam)
     const stream = canvas.captureStream(60)
     this._webrtc.webrtc.localStreams.push(stream)
     this._webrtc.on('createdPeer', (peer) => {
-      peer.on('channelMessage', (peer, label, message) => {
-        if (message.type === 'speeds') {
-          this.setState({ speeds: message.payload })
-        }
+      peer.on('channelMessage', (peer, label, { type, payload }) => {
+        if (type === 'speeds') this.setState({ speeds: payload })
       })
     })
   }
