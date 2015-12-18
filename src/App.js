@@ -10,9 +10,7 @@ export class App extends Component {
   }
 
   componentDidMount () {
-    this._webrtc = new SimpleWebRTC({
-      remoteVideosEl: this.refs.remotes
-    })
+    this._webrtc = new SimpleWebRTC({})
     this._webrtc.joinRoom('tractor-beam')
     const canvas = ReactDOM.findDOMNode(this.refs.beam)
     const stream = canvas.captureStream(60)
@@ -31,7 +29,6 @@ export class App extends Component {
   render () {
     return (
       <div>
-        <div className='remotes' ref='remotes'/>
         <TractorBeam ref='beam' {...this.state}/>
       </div>
     )

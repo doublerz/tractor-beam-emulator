@@ -59,6 +59,11 @@ export default class TractorBeam extends Component {
     context.fillRect(6, -10, 4, 20)
     context.fillStyle = '#F00'
     context.fillRect(-6, -5, 12, 13)
+    context.rotate(-a)
+    context.translate(-x, -y)
+    context.fillStyle = '#000'
+    context.fillText(this.props.speeds[0], 10, 10)
+    context.fillText(this.props.speeds[1], 10, 20)
     context.restore()
   }
 
